@@ -1,0 +1,25 @@
+#!/bin/bash
+#簡化判斷錯誤時終止 if的三元運算
+
+FIND_ARGS_COUNT=`cat $1  | awk -F '+' '{for(i=1;i<=NF;i++){print $i;}}' | grep "args\[" | wc -l | sed "s/\ //g"`
+ARGS_PARAMETER_STRING=""
+
+FILENAME=$(basename "$1")
+FILENANE_WITHOUT_EXT="${FILENAME%.*}"
+
+JAVA_CLASS_PATH="/Users/huangjunhong/Desktop/jhon/test1/"
+
+(javac $1 -d $JAVA_CLASS_PATH) && {
+	echo "--------build OK----------"
+	for ((i=1;i<=$FIND_ARGS_COUNT;i++))
+	do
+		echo "請輸入你想要的值$i"
+		read ARGS_PARAMETER
+		ARGS_PARAMETER_STRING=${ARGS_PARAMETER_STRING}" "${ARGS_PARAMETER}
+	done
+} || {
+	echo "--------error-----------"
+	exit 1
+}
+
+java -cp $JAVA_CLASS_PATH `cat $1 | grep package |  awk '{print $2}' | sed "s/\;//g"`.$FILENANE_WITHOUT_EXT $ARGS_PARAMETER_STRING
